@@ -36,10 +36,11 @@ def main():
     ax2.imshow(train_photo, cmap="gray")
     ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)
 
-    #plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, optimize=True, format='jpeg')
-    plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
+    #==================顯示圖
+    #plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
 
-    plt.show()
+    #plt.show()
+    #==================顯示圖
 
     keypoints_train_img, features_train_img = select_descriptor_methods(train_photo_gray, method=feature_extraction_algo)
 
@@ -65,9 +66,10 @@ def main():
     ax2.imshow(cv2.drawKeypoints(query_photo_gray,keypoints_query_img,None,color=(0,255,0)))
     ax2.set_xlabel("(b)", fontsize=14)
 
-    plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', 
-                dpi=300,  format='jpeg')
-    plt.show()
+    #==================顯示圖
+    #plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')
+    #plt.show()
+    #==================顯示圖
 
     # 使用 BFMatcher 進行特徵匹配
     bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
