@@ -7,14 +7,14 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def main():
-    print("Hello, World!")
+    print("Start stitching")
 
     feature_extraction_algo = 'sift'
 
     feature_to_match = 'bf'
 
     # Make sure that the train image is the image that will be transformed
-    train_photo = cv2.imread('train.jpg')
+    train_photo = cv2.imread('frame1.jpg')
 
     # OpenCV defines the color channel in the order BGR 
     # Hence converting to RGB for Matplotlib
@@ -24,7 +24,7 @@ def main():
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
     # Do the same for the query image 
-    query_photo = cv2.imread('query.jpg')
+    query_photo = cv2.imread('frame0.jpg')
     query_photo = cv2.cvtColor(query_photo,cv2.COLOR_BGR2RGB)
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)
 
@@ -55,6 +55,9 @@ def main():
         class_id = keypoint.class_id
 
     features_query_img.shape
+
+    #圖片合併
+    #切縫合併
 
     # display the keypoints and features detected on both images
     fig, (ax1,ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20,8), constrained_layout=False)
@@ -91,12 +94,14 @@ def main():
     # I can take the max from the 2 individual images.
 
     width = query_photo.shape[1] + train_photo.shape[1]
-    print("width ", width) 
+    print("Total width : ", width) 
     # 2922 - Which is exactly the sum value of the width of 
     # my train.jpg and query.jpg
 
 
     height = max(query_photo.shape[0], train_photo.shape[0])
+    print("Total height : ", height)
+
 
     # otherwise, apply a perspective warp to stitch the images together
 
