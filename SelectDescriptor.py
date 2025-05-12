@@ -1,17 +1,20 @@
-import cv2  # 匯入 OpenCV，用於圖像處理
+import cv2  # 嚙論入 OpenCV嚙璀嚙諄抬蕭牊嚙踝蕭B嚙緲
 
 def select_descriptor_methods(image, method=None):    
     
     assert method is not None, "Please define a feature descriptor method. accepted Values are: 'sift', 'surf'"
     
-    if method == 'sift':
-        descriptor = cv2.SIFT_create()
-    elif method == 'surf':
-        descriptor = cv2.SURF_create()
-    elif method == 'brisk':
-        descriptor = cv2.BRISK_create()
-    elif method == 'orb':
-        descriptor = cv2.ORB_create()
+    match method:
+        case 'sift':
+            descriptor = cv2.SIFT_create()
+        case 'surf':
+            descriptor = cv2.SURF_create()
+        case 'brisk':
+            descriptor = cv2.BRISK_create()
+        # case 'brief':
+        #     descriptor = cv2.xfeatures2d.BriefDescriptorExtractor_create()
+        case 'orb':
+            descriptor = cv2.ORB_create()
         
     (keypoints, features) = descriptor.detectAndCompute(image, None)
     

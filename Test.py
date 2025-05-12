@@ -1,7 +1,9 @@
 import cv2  # 匯入 OpenCV，用於圖像處理
 import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
-import imageio # 匯入 ImageIO，用於圖像讀取與保存
+import imageio
+import numpy as np # 匯入 ImageIO，用於圖像讀取與保存
 
+from KeyPointsMatching import key_points_matching, key_points_matching_KNN
 from SelectDescriptor import select_descriptor_methods  
 from HomographyStitching import homography_stitching  # 匯入自定義的單應性拼接函數
 
@@ -12,21 +14,26 @@ warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 def main():
     print("Start stitching")  # 輸出開始拼接的訊息
 
+    # SIFT
+    # SURF
+    # BRISK
+    # BRIEF
+    # ORB
     feature_extraction_algo = 'sift'  # 設定特徵提取算法為 SIFT
 
+    #bf
+    #knn
     feature_to_match = 'bf'  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
     # 確保訓練圖片是將被變換的圖片
-    train_photo = cv2.imread('frame1.jpg')  # 讀取訓練圖片
-
+    train_photo = cv2.imread('svx2.jpg')  # 讀取訓練圖片
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
     train_photo = cv2.cvtColor(train_photo, cv2.COLOR_BGR2RGB)
-
     # 將訓練圖片轉換為灰階
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
     # 對查詢圖片執行相同操作
-    query_photo = cv2.imread('frame0.jpg')  # 讀取查詢圖片
+    query_photo = cv2.imread('svx1.jpg')  # 讀取查詢圖片
     query_photo = cv2.cvtColor(query_photo, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
@@ -39,10 +46,14 @@ def main():
     ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)  # 設定標籤
 
     #==================顯示圖
-    #plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存圖像（目前註解掉）
+    plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存圖像（目前註解掉）
 
     #plt.show()  # 顯示圖像（目前註解掉）
     #==================顯示圖
+
+
+
+
 
     # 提取訓練圖片的特徵點和描述符
     keypoints_train_img, features_train_img = select_descriptor_methods(train_photo_gray, method=feature_extraction_algo)
@@ -59,6 +70,7 @@ def main():
         octave = keypoint.octave  # 特徵點所在的金字塔層
         class_id = keypoint.class_id  # 特徵點的類別 ID
 
+    #print("keypoints_query_img : "+len(keypoints_query_img))  # 輸出查詢圖片的特徵點數量
     features_query_img.shape  # 獲取查詢圖片特徵描述符的形狀（未使用）
 
     #圖片合併
@@ -66,6 +78,7 @@ def main():
 
     # 顯示檢測到的特徵點
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 8), constrained_layout=False)
+
     ax1.imshow(cv2.drawKeypoints(train_photo_gray, keypoints_train_img, None, color=(0, 255, 0)))  # 訓練圖片的特徵點
     ax1.set_xlabel("(a)", fontsize=14)
 
@@ -73,16 +86,39 @@ def main():
     ax2.set_xlabel("(b)", fontsize=14)
 
     #==================顯示圖
-    #plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+    plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
     #plt.show()  # 顯示圖像（目前註解掉）
     #==================顯示圖
 
-    # 使用 BFMatcher 進行特徵匹配
-    bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-    matches = bf.match(features_train_img, features_query_img)
 
-    # 按照距離排序匹配結果
-    matches = sorted(matches, key=lambda x: x.distance)
+
+
+
+    # 使用 BFMatcher 進行特徵匹配
+    #bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+    # matches = bf.match(features_train_img, features_query_img)
+    # #matches = bf.knnMatch(features_train_img, features_query_img, k=6)  # 使用 KNN 匹配
+
+    # # 按照距離排序匹配結果
+    # matches = sorted(matches, key=lambda x: x.distance)
+    fig = plt.figure(figsize=(20, 8))
+    #matches = None
+    #mapped_features_image = None
+    match feature_to_match:
+        case 'bf':
+            matches = key_points_matching(features_train_img, features_query_img, feature_extraction_algo)
+            mapped_features_image = cv2.drawMatches(train_photo,keypoints_train_img,query_photo,keypoints_query_img,matches[:100],
+                None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        case 'knn':# Now for cross checking draw the feature-mapping lines also with KNN
+            matches = key_points_matching_KNN(features_train_img, features_query_img, ratio=0.75, method=feature_extraction_algo)
+            mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
+                None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+    plt.imshow(mapped_features_image)
+    plt.savefig("./output/"+feature_to_match+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存匹配結果圖像
+    #plt.show()
+
+
 
     # 呼叫 homography_stitching 函數計算單應性矩陣
     M = homography_stitching(keypoints_train_img, keypoints_query_img, matches, reprojThresh=4)
@@ -91,6 +127,8 @@ def main():
         print("Error!")
 
     (matches, Homography_Matrix, status) = M  # 解包返回值
+
+    print("Homography_Matrix : ", Homography_Matrix)
 
     # 計算拼接後圖像的寬度和高度
     width = query_photo.shape[1] + train_photo.shape[1]
@@ -107,7 +145,7 @@ def main():
 
     # 顯示拼接結果
     plt.figure(figsize=(20, 10))
-    plt.axis('off')
+    #plt.axis('off')
     plt.imshow(result)
 
     # 保存拼接結果
