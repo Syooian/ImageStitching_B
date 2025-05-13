@@ -1,7 +1,12 @@
+#pip install opencv-python.
 import cv2  # 匯入 OpenCV，用於圖像處理
+#pip install matplotlib
 import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
-import imageio
-import numpy as np # 匯入 ImageIO，用於圖像讀取與保存
+#pip install imageio
+import imageio # 匯入 ImageIO，用於圖像讀取與保存
+import numpy as np 
+
+#因有用到Switch寫法，所以Python需使用3.10以上版本
 
 from KeyPointsMatching import key_points_matching, key_points_matching_KNN
 from SelectDescriptor import select_descriptor_methods  
@@ -26,14 +31,14 @@ def main():
     feature_to_match = 'bf'  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
     # 確保訓練圖片是將被變換的圖片
-    train_photo = cv2.imread('svx2.jpg')  # 讀取訓練圖片
+    train_photo = cv2.imread('svx2_Small.jpg')  # 讀取訓練圖片
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
     train_photo = cv2.cvtColor(train_photo, cv2.COLOR_BGR2RGB)
     # 將訓練圖片轉換為灰階
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
     # 對查詢圖片執行相同操作
-    query_photo = cv2.imread('svx1.jpg')  # 讀取查詢圖片
+    query_photo = cv2.imread('svx1_Small.jpg')  # 讀取查詢圖片
     query_photo = cv2.cvtColor(query_photo, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
@@ -46,7 +51,7 @@ def main():
     ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)  # 設定標籤
 
     #==================顯示圖
-    plt.savefig("./_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存圖像（目前註解掉）
+    plt.savefig("./output/original_compare"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存圖像（目前註解掉）
 
     #plt.show()  # 顯示圖像（目前註解掉）
     #==================顯示圖
