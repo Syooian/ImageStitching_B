@@ -31,14 +31,14 @@ def main():
     feature_to_match = 'bf'  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
     # 確保訓練圖片是將被變換的圖片
-    train_photo = cv2.imread('svx2_Small.jpg')  # 讀取訓練圖片
+    train_photo = cv2.imread('ba2.jpg')  # 讀取訓練圖片
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
     train_photo = cv2.cvtColor(train_photo, cv2.COLOR_BGR2RGB)
     # 將訓練圖片轉換為灰階
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
     # 對查詢圖片執行相同操作
-    query_photo = cv2.imread('svx1_Small.jpg')  # 讀取查詢圖片
+    query_photo = cv2.imread('ba1.jpg')  # 讀取查詢圖片
     query_photo = cv2.cvtColor(query_photo, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
