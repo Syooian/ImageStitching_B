@@ -19,10 +19,23 @@ import warnings  # 匯入 warnings 模組，用於處理警告訊息
 warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 
 def main():
-    ImageStitching('ba2.jpg', 'ba1.jpg', True, True)
+    StitchImageByFileName('ba2.jpg', 'ba1.jpg', True, True)
 
-def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
-    print("Start stitching "+TrainPhoto+" & "+QueryPhoto+", FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
+
+def StitchImageBySource(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
+    print("StitchImageBySource")
+
+    if TrainPhoto is None:
+        print("TrainPhoto is None")
+        return None
+    if QueryPhoto is None:
+        print("QueryPhoto is None")
+        return None
+
+    return __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch)
+
+def StitchImageByFileName(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
+    print("StitchImageByFileName "+TrainPhoto +" & "+ QueryPhoto)
 
     if not Path(TrainPhoto).is_file():
         print("TrainPhoto "+TrainPhoto + " is not exists")
@@ -31,6 +44,17 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
         print("QueryPhoto "+QueryPhoto + " is not exists")
         return None
 
+    # 確保訓練圖片是將被變換的圖片
+    train_photo = cv2.imread(TrainPhoto)  # 讀取訓練圖片
+    # 對查詢圖片執行相同操作
+    query_photo = cv2.imread(QueryPhoto)  # 讀取查詢圖片
+
+    return __Stitching(train_photo, query_photo, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch)
+
+# 私有
+def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch):
+    print("Start stitching FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
+    
     # SIFT
     # SURF
     # BRISK
@@ -42,16 +66,14 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
     #knn
     feature_to_match = FeatureToMatch  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
-    # 確保訓練圖片是將被變換的圖片
-    train_photo = cv2.imread(TrainPhoto)  # 讀取訓練圖片
+
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
-    train_photo = cv2.cvtColor(train_photo, cv2.COLOR_BGR2RGB)
+    train_photo = cv2.cvtColor(TrainPhoto, cv2.COLOR_BGR2RGB)
     # 將訓練圖片轉換為灰階
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
-    # 對查詢圖片執行相同操作
-    query_photo = cv2.imread(QueryPhoto)  # 讀取查詢圖片
-    query_photo = cv2.cvtColor(query_photo, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
+
+    query_photo = cv2.cvtColor(QueryPhoto, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
     # 顯示查詢圖片和訓練圖片
@@ -191,6 +213,8 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
         plt.show()  
 
     return result  # 返回拼接結果圖像
+
+
 
 class FeatureExtractionAlgoEnum(Enum):
     SIFT=0
