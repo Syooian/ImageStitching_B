@@ -20,7 +20,7 @@ def main():
     ImageStitching('ba2.jpg', 'ba1.jpg', True, True)
 
 def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
-    print("Start stitching")  # 輸出開始拼接的訊息
+    print("Start stitching "+TrainPhoto+" & "+QueryPhoto+", FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
 
     # SIFT
     # SURF
@@ -180,6 +180,8 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
     #最終顯示圖像
     if ShowPhoto:
         plt.show()  
+
+    return result  # 返回拼接結果圖像
 
 if __name__ == "__main__":
     main()
