@@ -176,8 +176,10 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
     # 保存拼接結果
     if SavePhoto:
         imageio.imwrite("./output/horizontal_panorama_img_"+'.jpeg', result)
-
-    plt.show()  # 顯示圖像
+        
+    #最終顯示圖像
+    if ShowPhoto:
+        plt.show()  
 
 if __name__ == "__main__":
     main()
