@@ -60,11 +60,11 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     # BRISK
     # BRIEF
     # ORB
-    feature_extraction_algo = FeatureExtractionAlgo  # 設定特徵提取算法為 SIFT
+    #feature_extraction_algo = FeatureExtractionAlgo  # 設定特徵提取算法為 SIFT
 
     #bf
     #knn
-    feature_to_match = FeatureToMatch  # 設定特徵匹配方法為暴力匹配（BFMatcher）
+    #feature_to_match = FeatureToMatch  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
 
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
@@ -98,10 +98,10 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
 
     # 提取訓練圖片的特徵點和描述符
-    keypoints_train_img, features_train_img = select_descriptor_methods(train_photo_gray, method=feature_extraction_algo)
+    keypoints_train_img, features_train_img = select_descriptor_methods(train_photo_gray, method=FeatureExtractionAlgo)
 
     # 提取查詢圖片的特徵點和描述符
-    keypoints_query_img, features_query_img = select_descriptor_methods(query_photo_gray, method=feature_extraction_algo)
+    keypoints_query_img, features_query_img = select_descriptor_methods(query_photo_gray, method=FeatureExtractionAlgo)
 
     # 遍歷查詢圖片的特徵點，提取相關屬性（僅作為範例，未使用）
     for keypoint in keypoints_query_img:
@@ -129,7 +129,7 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
     #存圖
     if SavePhoto:
-        plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+        plt.savefig("./output/" + FeatureExtractionAlgo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
 
     #==================顯示圖
     
@@ -150,13 +150,13 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     fig = plt.figure(figsize=(20, 8))
     #matches = None
     #mapped_features_image = None
-    match feature_to_match:
+    match FeatureToMatch:
         case 'bf':
-            matches = key_points_matching(features_train_img, features_query_img, feature_extraction_algo)
+            matches = key_points_matching(features_train_img, features_query_img, FeatureExtractionAlgo)
             mapped_features_image = cv2.drawMatches(train_photo,keypoints_train_img,query_photo,keypoints_query_img,matches[:100],
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
         case 'knn':# Now for cross checking draw the feature-mapping lines also with KNN
-            matches = key_points_matching_KNN(features_train_img, features_query_img, ratio=0.75, method=feature_extraction_algo)
+            matches = key_points_matching_KNN(features_train_img, features_query_img, ratio=0.75, method=FeatureExtractionAlgo)
             mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
@@ -168,7 +168,7 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
     #存圖
     if SavePhoto:
-        plt.savefig("./output/"+feature_to_match+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
+        plt.savefig("./output/"+FeatureToMatch+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
 
 
 
