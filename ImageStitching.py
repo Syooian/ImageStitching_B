@@ -1,4 +1,5 @@
-#pip install opencv-python.
+# OpenCV安裝：pip install opencv-python.import warnings  # 匯入 warnings 模組，用於處理警告訊息
+from pathlib import Path
 import cv2  # 匯入 OpenCV，用於圖像處理
 #pip install matplotlib
 import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
@@ -21,6 +22,13 @@ def main():
 
 def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
     print("Start stitching "+TrainPhoto+" & "+QueryPhoto+", FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
+
+    if not Path(TrainPhoto).is_file():
+        print("TrainPhoto "+TrainPhoto + " is not exists")
+        return None
+    if not Path(QueryPhoto).is_file():
+        print("QueryPhoto "+QueryPhoto + " is not exists")
+        return None
 
     # SIFT
     # SURF
