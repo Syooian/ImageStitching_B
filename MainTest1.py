@@ -1,11 +1,16 @@
 import imageio
 from ImageStitching import ImageStitching
 import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
+from ImageStitching import FeatureExtractionAlgoEnum
 
 def main():
     print("MainTest1.py")
 
     NewStitchedImage=ImageStitching('ba22.jpg', 'ba1.jpg')
+
+    fea = FeatureExtractionAlgoEnum.SIFT
+    print(fea.SIFT.name+" : "+str(fea.SIFT.value));
+
 
     #寫入新檔案
     if (NewStitchedImage is not None):

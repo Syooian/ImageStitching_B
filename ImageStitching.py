@@ -12,6 +12,7 @@ import numpy as np
 from KeyPointsMatching import key_points_matching, key_points_matching_KNN
 from SelectDescriptor import select_descriptor_methods  
 from HomographyStitching import homography_stitching  # 匯入自定義的單應性拼接函數
+from enum import Enum
 
 cv2.ocl.setUseOpenCL(False)  # 禁用 OpenCL 加速以避免潛在的兼容性問題
 import warnings  # 匯入 warnings 模組，用於處理警告訊息
@@ -190,6 +191,16 @@ def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, Fea
         plt.show()  
 
     return result  # 返回拼接結果圖像
+
+class FeatureExtractionAlgoEnum(Enum):
+    SIFT=0
+    SURF=1
+    BRISK=2
+    BRIEF=3
+    ORB=4
+class FeatureToMatchEnum(Enum):
+    BF = 0
+    KNN=1
 
 if __name__ == "__main__":
     main()
