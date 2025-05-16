@@ -17,6 +17,9 @@ import warnings  # 匯入 warnings 模組，用於處理警告訊息
 warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 
 def main():
+    ImageStitching(True, True, 'ba2.jpg', 'ba1.jpg')
+
+def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
     print("Start stitching")  # 輸出開始拼接的訊息
 
     # SIFT
@@ -24,21 +27,21 @@ def main():
     # BRISK
     # BRIEF
     # ORB
-    feature_extraction_algo = 'sift'  # 設定特徵提取算法為 SIFT
+    feature_extraction_algo = FeatureExtractionAlgo  # 設定特徵提取算法為 SIFT
 
     #bf
     #knn
-    feature_to_match = 'bf'  # 設定特徵匹配方法為暴力匹配（BFMatcher）
+    feature_to_match = FeatureToMatch  # 設定特徵匹配方法為暴力匹配（BFMatcher）
 
     # 確保訓練圖片是將被變換的圖片
-    train_photo = cv2.imread('ba2.jpg')  # 讀取訓練圖片
+    train_photo = cv2.imread(TrainPhoto)  # 讀取訓練圖片
     # OpenCV 的顏色通道順序為 BGR，需轉換為 RGB 以便 Matplotlib 正確顯示
     train_photo = cv2.cvtColor(train_photo, cv2.COLOR_BGR2RGB)
     # 將訓練圖片轉換為灰階
     train_photo_gray = cv2.cvtColor(train_photo, cv2.COLOR_RGB2GRAY)
 
     # 對查詢圖片執行相同操作
-    query_photo = cv2.imread('ba1.jpg')  # 讀取查詢圖片
+    query_photo = cv2.imread(QueryPhoto)  # 讀取查詢圖片
     query_photo = cv2.cvtColor(query_photo, cv2.COLOR_BGR2RGB)  # 轉換為 RGB
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
