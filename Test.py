@@ -17,9 +17,9 @@ import warnings  # 匯入 warnings 模組，用於處理警告訊息
 warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 
 def main():
-    ImageStitching(True, True, 'ba2.jpg', 'ba1.jpg')
+    ImageStitching('ba2.jpg', 'ba1.jpg', True, True)
 
-def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
+def ImageStitching(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
     print("Start stitching")  # 輸出開始拼接的訊息
 
     # SIFT
@@ -53,8 +53,11 @@ def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtracti
     ax2.imshow(train_photo, cmap="gray")  # 顯示訓練圖片
     ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)  # 設定標籤
 
+    #存圖
+    if SavePhoto:
+        plt.savefig("./output/original_compare"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
     #==================顯示圖
-    plt.savefig("./output/original_compare"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存圖像（目前註解掉）
+
 
     #plt.show()  # 顯示圖像（目前註解掉）
     #==================顯示圖
@@ -93,8 +96,12 @@ def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtracti
     ax2.imshow(cv2.drawKeypoints(query_photo_gray, keypoints_query_img, None, color=(0, 255, 0)))  # 查詢圖片的特徵點
     ax2.set_xlabel("(b)", fontsize=14)
 
+    #存圖
+    if SavePhoto:
+        plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+
     #==================顯示圖
-    plt.savefig("./output/" + feature_extraction_algo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+    
     #plt.show()  # 顯示圖像（目前註解掉）
     #==================顯示圖
 
@@ -122,9 +129,19 @@ def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtracti
             mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
+
+
     plt.imshow(mapped_features_image)
-    plt.savefig("./output/"+feature_to_match+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')  # 保存匹配結果圖像
+    
     #plt.show()
+
+    #存圖
+    if SavePhoto:
+        plt.savefig("./output/"+feature_to_match+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
+
+
+
+
 
 
 
@@ -157,7 +174,8 @@ def ImageStitching(ShowPhoto, SavePhoto, TrainPhoto, QueryPhoto, FeatureExtracti
     plt.imshow(result)
 
     # 保存拼接結果
-    imageio.imwrite("./output/horizontal_panorama_img_"+'.jpeg', result)
+    if SavePhoto:
+        imageio.imwrite("./output/horizontal_panorama_img_"+'.jpeg', result)
 
     plt.show()  # 顯示圖像
 
