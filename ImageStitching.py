@@ -216,6 +216,9 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     if ShowPhoto:
         plt.show()  
 
+    # 釋放記憶體
+    plt.close('all')  # 關閉 Matplotlib 窗口
+
     return result  # 返回拼接結果圖像
 
 
