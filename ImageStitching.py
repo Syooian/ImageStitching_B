@@ -182,7 +182,11 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     if M is None:  # 如果無法計算單應性矩陣，輸出錯誤訊息
         print("Error!")
 
-    (matches, Homography_Matrix, status) = M  # 解包返回值
+    try:
+        (matches, Homography_Matrix, status) = M  # 解包返回值
+    except Exception as e:
+        print("解包返回值 EX : "+str(e))
+        return None
 
     print("Homography_Matrix : ", Homography_Matrix)
 
