@@ -25,9 +25,11 @@ def main():
     Sec=0
 
     while True:
-        if datetime.now().second != Sec:
-            print(datetime.now())
-            Sec=datetime.now().second
+        # if datetime.now().second != Sec:
+        #     print(datetime.now())
+        #     Sec=datetime.now().second
+
+        StartStitching=datetime.now()
 
 
         # 讀取攝影機畫面
@@ -59,6 +61,8 @@ def main():
             # plt.imshow(NewStitchedImage)  # 帶入圖片
             # plt.show()  # 顯示圖片
             cv2.imshow("NewStitchedImage", NewStitchedImage)
+
+        print("合併所耗時間："+str(datetime.now()-StartStitching))
 
         # 按下 'q' 鍵退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
