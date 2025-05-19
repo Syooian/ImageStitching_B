@@ -1,3 +1,4 @@
+from _pytest.tmpdir import RetentionType
 import cv2
 import ImageStitching
 import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
@@ -6,21 +7,17 @@ from datetime import datetime
 def main():
     print("WebCamTest1.py")
 
-    print("啟動攝影機0中...")
-    cap0 = cv2.VideoCapture(0)
-    if cap0.isOpened():
-        print("攝影機0已開啟")
-    else:
-        print("無法開啟攝影機0")
-        return
+    WebCams=[]
+    
+    for a in range(2):
+        print("啟動攝影機"+str(a)+"中...")
 
-    print("啟動攝影機1中...")
-    cap1 = cv2.VideoCapture(1)
-    if cap0.isOpened():
-        print("攝影機1已開啟")
-    else:
-        print("無法開啟攝影機1")
-        return
+        WebCams.append(cv2.VideoCapture(a))
+        if WebCams[a].isOpened():
+            print("攝影機"+str(a)+"已開啟")
+        else:
+            print("無法開啟攝影機"+str(a))
+            return
 
     Sec=0
 
@@ -31,26 +28,21 @@ def main():
 
         StartStitching=datetime.now()
 
-
         # 讀取攝影機畫面
-        ret0, frame0 = cap0.read()
-        if not ret0:
-            print("無法讀取畫面0")
-            break
-        # 顯示WebCam0畫面
-        cv2.imshow('WebCam0', frame0)
+        for WebCam in WebCams:
+            Ret, Frame=WebCam.read()
+            if not Ret:
+                print("無法讀取畫面"+str(WebCam))
+                break
 
-        ret1, frame1 = cap1.read()
-        if not ret1:
-            print("無法讀取畫面1")
-            break
-        # 顯示WebCam1畫面
-        cv2.imshow('WebCam1', frame1)
+            # 顯示攝影機畫面
+            cv2.imshow('WebCam', Frame)
+
 
         #if(cv2.waitKey(1) & 0xFF==ord('s')):#按下S鍵時合併一次，按鍵偵測一定要至少有一個cv2.imshow才會有作用
         #print("WebCamTest1 Start stitching")
 
-        NewStitchedImage = ImageStitching.StitchImageBySource(frame1, frame0)
+        NewStitchedImage = ImageStitching.StitchImageBySource(WebCams[1], WebCams[0])
 
         #plt.close('all')  # 關閉所有 Matplotlib 窗口 (因為在合併圖片中已多次使用，再次呼叫會把那些視窗都彈出來)
 
@@ -69,8 +61,8 @@ def main():
             break
 
     # 釋放資源
-    cap0.release()
-    cap1.release()
+    for a in WebCams:
+        WebCams[a].release()
     #cv2.destroyAllWindows()
 
 if __name__ == "__main__":
