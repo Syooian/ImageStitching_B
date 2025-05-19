@@ -19,6 +19,8 @@ def main():
             print("無法開啟攝影機"+str(a))
             return
 
+    Frames = [None] * len(WebCams)
+
     Sec=0
 
     while True:
@@ -29,20 +31,23 @@ def main():
         StartStitching=datetime.now()
 
         # 讀取攝影機畫面
-        for WebCam in WebCams:
-            Ret, Frame=WebCam.read()
+        for a in range(len(WebCams)):
+            print("讀取攝影機"+str(a))
+            Ret, Frame=WebCams[a].read()
             if not Ret:
-                print("無法讀取畫面"+str(WebCam))
+                print("無法讀取畫面"+str(a))
                 break
 
+            Frames[a]=Frame
+
             # 顯示攝影機畫面
-            cv2.imshow('WebCam', Frame)
+            cv2.imshow("WebCam"+str(a), Frame)
 
 
         #if(cv2.waitKey(1) & 0xFF==ord('s')):#按下S鍵時合併一次，按鍵偵測一定要至少有一個cv2.imshow才會有作用
         #print("WebCamTest1 Start stitching")
 
-        NewStitchedImage = ImageStitching.StitchImageBySource(WebCams[1], WebCams[0])
+        NewStitchedImage = ImageStitching.StitchImageBySource(Frames[1], Frames[0])
 
         #plt.close('all')  # 關閉所有 Matplotlib 窗口 (因為在合併圖片中已多次使用，再次呼叫會把那些視窗都彈出來)
 
@@ -61,8 +66,8 @@ def main():
             break
 
     # 釋放資源
-    for a in WebCams:
-        WebCams[a].release()
+    for Webcam in WebCams:
+        Webcam.release()
     #cv2.destroyAllWindows()
 
 if __name__ == "__main__":
