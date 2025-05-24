@@ -9,12 +9,14 @@ import numpy as np
 
 from datetime import datetime
 
+from ImageStitchingEnum import FeatureExtractionAlgoEnum  # 匯入自定義的特徵提取算法枚舉類
+from ImageStitchingEnum import FeatureToMatchEnum  # 匯入自定義的特徵匹配方法枚舉類
+
 #因有用到Switch寫法，所以Python需使用3.10以上版本
 
 from KeyPointsMatching import key_points_matching, key_points_matching_KNN
 from SelectDescriptor import select_descriptor_methods  
 from HomographyStitching import homography_stitching  # 匯入自定義的單應性拼接函數
-from enum import Enum
 
 cv2.ocl.setUseOpenCL(False)  # 禁用 OpenCL 加速以避免潛在的兼容性問題
 import warnings  # 匯入 warnings 模組，用於處理警告訊息
@@ -25,7 +27,7 @@ def main():
 
 StartStitchingTime=0
 
-def StitchImageBySource(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
+def StitchImageBySource(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo=FeatureExtractionAlgoEnum.SIFT, FeatureToMatch=FeatureToMatchEnum.BF):
     print("StitchImageBySource")
 
     if TrainPhoto is None:
@@ -37,7 +39,7 @@ def StitchImageBySource(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False
 
     return __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch)
 
-def StitchImageByFileName(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
+def StitchImageByFileName(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo=FeatureExtractionAlgoEnum.SIFT, FeatureToMatch=FeatureToMatchEnum.BF):
     print("StitchImageByFileName "+TrainPhoto +" & "+ QueryPhoto)
 
     if not Path(TrainPhoto).is_file():
@@ -56,7 +58,7 @@ def StitchImageByFileName(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=Fal
 
 # 私有
 def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch):
-    print("Start stitching FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
+    print("Start stitching FeatureExtractionAlgo : "+FeatureExtractionAlgo.name+", FeatureToMatch : "+FeatureToMatch.name)  # 輸出開始拼接的訊息
 
     StartStitchingTime = datetime.now()
     
@@ -136,7 +138,7 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
         #存圖
         if SavePhoto:
-            plt.savefig("./output/" + FeatureExtractionAlgo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+            plt.savefig("./output/" + FeatureExtractionAlgo.name + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
 
     #==================顯示圖
     
@@ -158,11 +160,11 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     #matches = None
     #mapped_features_image = None
     match FeatureToMatch:
-        case 'bf':
+        case FeatureToMatchEnum.BF:
             matches = key_points_matching(features_train_img, features_query_img, FeatureExtractionAlgo)
             mapped_features_image = cv2.drawMatches(train_photo,keypoints_train_img,query_photo,keypoints_query_img,matches[:100],
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-        case 'knn':# Now for cross checking draw the feature-mapping lines also with KNN
+        case FeatureToMatchEnum.KNN:# Now for cross checking draw the feature-mapping lines also with KNN
             matches = key_points_matching_KNN(features_train_img, features_query_img, ratio=0.75, method=FeatureExtractionAlgo)
             mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
@@ -176,7 +178,7 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
     #存圖
     if SavePhoto:
-        plt.savefig("./output/"+FeatureToMatch+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
+        plt.savefig("./output/"+FeatureToMatch.name+"_matches_img_"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
 
 
 
@@ -231,18 +233,6 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     print("合併所耗時間："+str(datetime.now()-StartStitchingTime))
 
     return result  # 返回拼接結果圖像
-
-
-
-class FeatureExtractionAlgoEnum(Enum):
-    SIFT=0
-    SURF=1
-    BRISK=2
-    BRIEF=3
-    ORB=4
-class FeatureToMatchEnum(Enum):
-    BF = 0
-    KNN=1
 
 if __name__ == "__main__":
     main()

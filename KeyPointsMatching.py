@@ -1,4 +1,5 @@
 import cv2
+from ImageStitchingEnum import FeatureExtractionAlgoEnum  # 匯入自定義的特徵提取算法枚舉類
 
 def key_points_matching(features_train_img, features_query_img, method):
     """
@@ -59,8 +60,11 @@ def create_matching_object(method,crossCheck):
     # crossCheck - which is false by default. If it is true, Matcher returns only those matches 
     # with value (i,j) such that i-th descriptor in set A has j-th descriptor in set B as the best match 
     # and vice-versa. 
-    if method == 'sift' or method == 'surf':
-        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=crossCheck)
-    elif method == 'orb' or method == 'brisk':
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=crossCheck)
+
+    match method:
+        case FeatureExtractionAlgoEnum.SIFT | FeatureExtractionAlgoEnum.SURF:
+            bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=crossCheck)
+        case FeatureExtractionAlgoEnum.BRISK | FeatureExtractionAlgoEnum.ORB:
+            bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=crossCheck)
+
     return bf
