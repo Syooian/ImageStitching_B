@@ -23,7 +23,7 @@ import warnings  # 匯入 warnings 模組，用於處理警告訊息
 warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 
 def main():
-    StitchImageByFileName('ba2.jpg', 'ba1.jpg', True, True)
+    StitchImageByFileName('ba2.jpg', 'ba1.jpg', FeatureExtractionAlgo=FeatureExtractionAlgoEnum.ORB)
 
 StartStitchingTime=0
 
@@ -157,15 +157,27 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     # # 按照距離排序匹配結果
     # matches = sorted(matches, key=lambda x: x.distance)
 
+    def CheckMatches(matches):
+        if matches is None or len(matches) == 0:
+            print("No matches found.")
+            return False
+        return True
+
     #matches = None
     #mapped_features_image = None
     match FeatureToMatch:
         case FeatureToMatchEnum.BF:
             matches = key_points_matching(features_train_img, features_query_img, FeatureExtractionAlgo)
-            mapped_features_image = cv2.drawMatches(train_photo,keypoints_train_img,query_photo,keypoints_query_img,matches[:100],
+            if not CheckMatches(matches):
+                return None
+
+            mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, matches[:100],
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
         case FeatureToMatchEnum.KNN:# Now for cross checking draw the feature-mapping lines also with KNN
             matches = key_points_matching_KNN(features_train_img, features_query_img, ratio=0.75, method=FeatureExtractionAlgo)
+            if not CheckMatches(matches):
+                return None
+
             mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
@@ -190,7 +202,8 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     M = homography_stitching(keypoints_train_img, keypoints_query_img, matches, reprojThresh=4)
 
     if M is None:  # 如果無法計算單應性矩陣，輸出錯誤訊息
-        print("Error!")
+        print("homography_stitching is none!")
+        return None
 
     try:
         (matches, Homography_Matrix, status) = M  # 解包返回值
@@ -208,6 +221,10 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     print("Total height : ", height)  # 輸出總高度
 
     # 使用單應性矩陣進行透視變換，將訓練圖片對齊到查詢圖片
+    if Homography_Matrix is None or Homography_Matrix.shape != (3, 3):
+        # 檢查 Homography_Matrix 是否有效： 在使用 cv2.warpPerspective 前，檢查矩陣是否為 None 並且符合要求
+        print("Invalid Homography_Matrix!")
+        return None
     result = cv2.warpPerspective(train_photo, Homography_Matrix, (width, height))
 
     # 將查詢圖片的像素覆蓋到結果圖像中
@@ -227,8 +244,8 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
         if ShowPhoto:
             plt.show()  
 
-        # 釋放記憶體
-        plt.close('all')  # 關閉 Matplotlib 窗口
+    # 釋放記憶體
+    plt.close('all')  # 關閉 Matplotlib 窗口
 
     print("合併所耗時間："+str(datetime.now()-StartStitchingTime))
 
