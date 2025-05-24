@@ -28,7 +28,7 @@ def main():
         #     print(datetime.now())
         #     Sec=datetime.now().second
 
-        StartStitching=datetime.now()
+        #StartStitching=datetime.now()
 
         # 讀取攝影機畫面
         for a in range(len(WebCams)):
@@ -59,7 +59,7 @@ def main():
             # plt.show()  # 顯示圖片
             cv2.imshow("NewStitchedImage", NewStitchedImage)
 
-        print("合併所耗時間："+str(datetime.now()-StartStitching))
+        #print("合併所耗時間："+str(datetime.now()-StartStitching))
 
         # 按下 'q' 鍵退出
         if cv2.waitKey(1) & 0xFF == ord('q'):

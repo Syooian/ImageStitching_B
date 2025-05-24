@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt  # 匯入 Matplotlib，用於圖像顯示
 import imageio # 匯入 ImageIO，用於圖像讀取與保存
 import numpy as np 
 
+from datetime import datetime
+
 #因有用到Switch寫法，所以Python需使用3.10以上版本
 
 from KeyPointsMatching import key_points_matching, key_points_matching_KNN
@@ -21,6 +23,7 @@ warnings.filterwarnings('ignore')  # 忽略所有警告訊息
 def main():
     StitchImageByFileName('ba2.jpg', 'ba1.jpg', True, True)
 
+StartStitchingTime=0
 
 def StitchImageBySource(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=False, FeatureExtractionAlgo='sift', FeatureToMatch='bf'):
     print("StitchImageBySource")
@@ -54,6 +57,8 @@ def StitchImageByFileName(TrainPhoto, QueryPhoto, ShowPhoto=False, SavePhoto=Fal
 # 私有
 def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionAlgo, FeatureToMatch):
     print("Start stitching FeatureExtractionAlgo : "+FeatureExtractionAlgo+", FeatureToMatch : "+FeatureToMatch)  # 輸出開始拼接的訊息
+
+    StartStitchingTime = datetime.now()
     
     # SIFT
     # SURF
@@ -77,16 +82,17 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     query_photo_gray = cv2.cvtColor(query_photo, cv2.COLOR_RGB2GRAY)  # 轉換為灰階
 
     # 顯示查詢圖片和訓練圖片
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=False, figsize=(16, 9))
-    ax1.imshow(query_photo, cmap="gray")  # 顯示查詢圖片
-    ax1.set_xlabel("Query image", fontsize=14)  # 設定標籤
+    if ShowPhoto or SavePhoto:
+        fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=False, figsize=(16, 9))
+        ax1.imshow(query_photo, cmap="gray")  # 顯示查詢圖片
+        ax1.set_xlabel("Query image", fontsize=14)  # 設定標籤
 
-    ax2.imshow(train_photo, cmap="gray")  # 顯示訓練圖片
-    ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)  # 設定標籤
+        ax2.imshow(train_photo, cmap="gray")  # 顯示訓練圖片
+        ax2.set_xlabel("Train image (Image to be transformed)", fontsize=14)  # 設定標籤
 
-    #存圖
-    if SavePhoto:
-        plt.savefig("./output/original_compare"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
+        #存圖
+        if SavePhoto:
+            plt.savefig("./output/original_compare"+'.jpeg', bbox_inches='tight', dpi=300, format='jpeg')
     #==================顯示圖
 
 
@@ -119,17 +125,18 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     #切縫合併
 
     # 顯示檢測到的特徵點
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 8), constrained_layout=False)
+    if ShowPhoto or SavePhoto:
+        fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 8), constrained_layout=False)
 
-    ax1.imshow(cv2.drawKeypoints(train_photo_gray, keypoints_train_img, None, color=(0, 255, 0)))  # 訓練圖片的特徵點
-    ax1.set_xlabel("(a)", fontsize=14)
+        ax1.imshow(cv2.drawKeypoints(train_photo_gray, keypoints_train_img, None, color=(0, 255, 0)))  # 訓練圖片的特徵點
+        ax1.set_xlabel("(a)", fontsize=14)
 
-    ax2.imshow(cv2.drawKeypoints(query_photo_gray, keypoints_query_img, None, color=(0, 255, 0)))  # 查詢圖片的特徵點
-    ax2.set_xlabel("(b)", fontsize=14)
+        ax2.imshow(cv2.drawKeypoints(query_photo_gray, keypoints_query_img, None, color=(0, 255, 0)))  # 查詢圖片的特徵點
+        ax2.set_xlabel("(b)", fontsize=14)
 
-    #存圖
-    if SavePhoto:
-        plt.savefig("./output/" + FeatureExtractionAlgo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
+        #存圖
+        if SavePhoto:
+            plt.savefig("./output/" + FeatureExtractionAlgo + "_features_img_"+'.jpeg', bbox_inches='tight', dpi=300,  format='jpeg')  # 保存特徵點圖像（目前註解掉）
 
     #==================顯示圖
     
@@ -147,7 +154,7 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
 
     # # 按照距離排序匹配結果
     # matches = sorted(matches, key=lambda x: x.distance)
-    fig = plt.figure(figsize=(20, 8))
+
     #matches = None
     #mapped_features_image = None
     match FeatureToMatch:
@@ -160,9 +167,10 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
             mapped_features_image = cv2.drawMatches(train_photo, keypoints_train_img, query_photo, keypoints_query_img, np.random.choice(matches,100),
                 None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
+    if ShowPhoto or SavePhoto:
+        fig = plt.figure(figsize=(20, 8))
 
-
-    plt.imshow(mapped_features_image)
+        plt.imshow(mapped_features_image)
     
     #plt.show()
 
@@ -203,21 +211,24 @@ def __Stitching(TrainPhoto, QueryPhoto, ShowPhoto, SavePhoto, FeatureExtractionA
     # 將查詢圖片的像素覆蓋到結果圖像中
     result[0:query_photo.shape[0], 0:query_photo.shape[1]] = query_photo
 
-    # 顯示拼接結果
-    plt.figure(figsize=(20, 10))
-    #plt.axis('off')
-    plt.imshow(result)
+    if ShowPhoto or SavePhoto:
+        # 顯示拼接結果
+        plt.figure(figsize=(20, 10))
+        #plt.axis('off')
+        plt.imshow(result)
 
-    # 保存拼接結果
-    if SavePhoto:
-        imageio.imwrite("./output/horizontal_panorama_img_"+'.jpeg', result)
-        
-    #最終顯示圖像
-    if ShowPhoto:
-        plt.show()  
+        # 保存拼接結果
+        if SavePhoto:
+            imageio.imwrite("./output/horizontal_panorama_img_"+'.jpeg', result)
 
-    # 釋放記憶體
-    plt.close('all')  # 關閉 Matplotlib 窗口
+        #最終顯示圖像
+        if ShowPhoto:
+            plt.show()  
+
+        # 釋放記憶體
+        plt.close('all')  # 關閉 Matplotlib 窗口
+
+    print("合併所耗時間："+str(datetime.now()-StartStitchingTime))
 
     return result  # 返回拼接結果圖像
 
